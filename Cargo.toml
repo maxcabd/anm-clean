@@ -1,0 +1,10 @@
+[package]
+name = "anmclean"
+version = "0.1.0"
+edition = "2021"
+description = "A simple program that removes redundant keyframes from a CyberConnect2 animation file."
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+binrw = "0.10.0"
