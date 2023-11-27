@@ -8,8 +8,11 @@ pub fn clean_curve(curve: &mut Curve, curve_header: &mut CurveHeader) {
     match curve {
         Curve::KeyframeVector3(keyframes) => {
             let values: Vec<Vector3> = keyframes.iter_mut().map(|keyframe| keyframe.value.clone()).collect();
+
+            // We'll need to use a set to check if the keyframes are filled with redundant / duplicate values
             let set: HashSet<Vector3> = values.into_iter().collect();
 
+            // If the length of the set is 1, or if all the values in the list are the same, then we only need to use the first keyframe
             if set.len() == 1 {
                 let first = keyframes.first().unwrap().clone();
                 let clean_curve = Curve::Vector3(vec![first.value.clone()]);
@@ -28,6 +31,7 @@ pub fn clean_curve(curve: &mut Curve, curve_header: &mut CurveHeader) {
                 keyframes.push(first);
             }
 
+            // We could save more space and instead just convert to a Euler rotation, but Quaternions are more precise anyways
             curve.append_null_keyframe();
             curve_header.frame_count += 1;
         }
