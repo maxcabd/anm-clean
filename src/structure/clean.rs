@@ -52,6 +52,9 @@ pub fn clean_curve(curve: &mut Curve, curve_header: &mut CurveHeader) {
 }
 
 pub fn update_header(curve: &Curve, curve_header: &mut CurveHeader) {
+    // We need to update the size (not important since the engine ignores it) and the frame count to account for the new keyframes amount
+    
+    // TODO: Use the actual size of the struct in bytes, this method doesn't return the actual size on disk
     curve_header.curve_size += mem::size_of_val(&curve) as u16;
     curve_header.frame_count = curve.get_frame_count() as u16;
 }
