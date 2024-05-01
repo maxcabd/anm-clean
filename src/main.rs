@@ -1,29 +1,31 @@
-use std::{fs::File, path::Path};
-use binrw::{BinReaderExt, BinWriterExt};
+mod clean;
 
-mod structure;
-mod utils;
+use std::path::Path;
 
-use crate::structure::anm::NuccAnm;
-use crate::structure::clean::*;
+use xfbin::{read_xfbin, write_xfbin};
+use xfbin::nucc::{NuccAnm, NuccStruct};
 
+use clean::*;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let filepath = Path::new(&args[1]);
 
-    let mut anm = File::open(filepath)
-        .unwrap()
-        .read_be::<NuccAnm>()
-        .unwrap();
-
-    for entry in anm.entries.iter_mut() {
-        for (curve, curve_header) in entry.curves.iter_mut().zip(&mut entry.curve_headers) {
-            clean_curve(curve, curve_header);
-            update_header(curve, curve_header);
-        }
+    if filepath.extension().unwrap() != "xfbin" {
+        panic!("File does not end with .xfbin");
     }
 
-    let mut file = File::create(filepath).unwrap();
-    file.write_be(&anm).unwrap();
+    let mut xfbin = read_xfbin(&Path::new(filepath)).unwrap();
+
+    for nucc_page in xfbin.pages.iter_mut() {
+        for nucc_struct in nucc_page.structs.iter_mut() {
+            if let Some(nucc_anm) = nucc_struct.downcast_mut::<NuccAnm>() {
+                clean_anm(nucc_anm);
+                *nucc_struct = Box::new(nucc_anm.clone()) as Box<dyn NuccStruct>;
+            } 
+        }
+    }
+    
+    write_xfbin(xfbin, &Path::new(filepath)).unwrap();
+    
 }

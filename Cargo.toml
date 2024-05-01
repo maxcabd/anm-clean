@@ -7,4 +7,5 @@ description = "A simple program that removes redundant keyframes from a CyberCon
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-binrw = "0.10.0"
+# used for reading and writing CyberConnect2's XFBIN files
+xfbin = { path = "../xfbin-dev" }
